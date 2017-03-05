@@ -1,4 +1,3 @@
-import Foundation
 import Firebase
 
 protocol FIRStorageDownloadable
@@ -6,8 +5,10 @@ protocol FIRStorageDownloadable
     var location: String? { get }
 }
 
-extension FIRStorageDownloadable
+extension FIRStorageDownloadable where Self: FIRModel
 {
+    var location: String? { return self.get("location") }
+    
     func getDownloadURL(completion: @escaping (URL?, Error?) -> Void)
     {
         guard let ref = self.getStorageRef() else
@@ -19,7 +20,7 @@ extension FIRStorageDownloadable
         ref.downloadURL(completion: completion)
     }
     
-    func getData(withMaxSize maxSize: Int64, completion: @escaping (Data?, Error?) -> Void)
+    func getData(withMaxSize maxSize: Int64, completion: @escaping (Foundation.Data?, Error?) -> Void)
     {
         guard let ref = self.getStorageRef() else
         {
