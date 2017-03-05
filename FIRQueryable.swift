@@ -10,7 +10,7 @@ extension FIRQueryable where Self: FIRModel
 {
     static func All(completion: @escaping ([Self]) -> Void)
     {
-        self.GetCollectionRef().child(COLLECTION_NAME).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
+        self.GetCollectionRef().observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
             
             completion(self.GetModels(fromContainerSnapshot: snapshot))
         }

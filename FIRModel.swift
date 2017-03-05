@@ -32,7 +32,6 @@ class FIRModel: CustomStringConvertible
         
         self.snapshot.childSnapshot(forPath: path).children.forEach { (childSnapshot) in
             
-            print(childSnapshot)
             items.append(T(snapshot: childSnapshot as! FIRDataSnapshot))
         }
         
