@@ -59,7 +59,7 @@ Subclass `FIRModel` to make your models serialize & deserialize from objects ret
 }
 ```
 
-The structure of a `FIRModel` representing a mural may look like this:
+The structure of a simple read-only `FIRModel` representing a mural may look like this:
 ```swift
 class MuralModel: FIRModel
 {	
@@ -75,3 +75,34 @@ class MuralModel: FIRModel
 	var artists: [ArtistModel] { return self.get(MuralModel.FIELD_ARTISTS) }
 }
 ```
+Artist:
+```swift
+class ArtistModel: FIRModel
+{	
+	static var FIELD_FIRSTNAME = "firstName"
+	static var FIELD_LASTNAME = "lastName"
+	static var FIELD_BIO = "bio"
+	static var FIELD_COUNTRY = "country"
+
+	var firstName: String? { return self.get(ArtistModel.FIELD_FIRSTNAME) }
+    var lastName: String? { return self.get(ArtistModel.FIELD_LASTNAME) }
+	var bio: String? { return self.get(ArtistModel.FIELD_BIO) }
+    var country: String? { return self.get(ArtistModel.FIELD_COUNTRY) }
+    var murals: [MuralModel] { return self.get(MuralModel.COLLECTION_NAME) }
+}
+```
+Image:
+```swift
+class ImageModel: FIRModel
+{
+	static var FIELD_LOCATION = "location"
+	var location: String? { return self.get(ImageModel.FIELD_LOCATION) }
+}
+```
+
+`FIRModel` mirrors the functionality of Firebase's `FIRDataSnapshot`, and is therefore constructed using one:
+```swift
+let mural = MuralModel(snapshot: muralSnapshot)
+```
+
+Properties can be as nested as necessary. Notice that `images` and `artists` in `MuralModel` are of complex object types. These are too subclasses of `FIRModel`. Look back at the database structure. As recommended in [Firebase's database structure guidelines](https://firebase.google.com/docs/database/web/structure-data]), in our database, the `images` and `artists` nodes consist only of keys. Because of this, the `images` node, for example, will consist of a number of `ImageModel`s 
