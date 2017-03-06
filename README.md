@@ -4,12 +4,12 @@ An easy-to-use object wrapper for Firebase's Realtime Database
 **Dependencies:** FirebaseDatabase, FirebaseStorage
 
 For demonstration purposes, we'll use the database structure defined below, comprised of murals & artists:
-
 ```json
 {
   "murals" : 
   {
-    "-KaQYfs3kbt4XgDY0ftb" : {
+    "-KaQYfs3kbt4XgDY0ftb" : 
+    {
       "artists" : 
       {
         "-KbJbPknFNECn07m1yzy" : true,
@@ -26,13 +26,6 @@ For demonstration purposes, we'll use the database structure defined below, comp
         {
           "location" : "/murals/m2.jpg"
         }
-      },
-      "location" : {
-        "city" : "Orange",
-        "lat" : 55,
-        "long" : 3543.2,
-        "name" : "Some building",
-        "state" : "CA"
       },
       "name" : "A really great mural"
     }
