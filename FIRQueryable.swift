@@ -8,9 +8,20 @@ protocol FIRQueryable
 
 extension FIRQueryable where Self: FIRModel
 {
+    func getExternal(completion: @escaping () -> Void)
+    {
+        let collectionRef = FIRDatabase.database().reference().child(Self.COLLECTION_NAME)
+        
+        collectionRef.child(self.key).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
+            
+            self.snapshot = snapshot
+            completion()
+        }
+    }
+    
     static func All(completion: @escaping ([Self]) -> Void)
     {
-        self.GetCollectionRef().observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
+        self.GetCollectionRef().child(COLLECTION_NAME).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
             
             completion(self.GetModels(fromContainerSnapshot: snapshot))
         }
@@ -39,7 +50,7 @@ extension FIRQueryable where Self: FIRModel
             .queryEqual(toValue: value)
             .queryLimited(toFirst: 1)
             .observeSingleEvent(of: .childAdded) { (snapshot: FIRDataSnapshot) in
-                
+            
                 completion(Self(snapshot: snapshot))
         }
     }

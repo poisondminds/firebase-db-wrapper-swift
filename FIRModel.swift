@@ -4,8 +4,8 @@ import Firebase
 
 class FIRModel: CustomStringConvertible
 {
-    private let _snapshot: FIRDataSnapshot
-    var snapshot: FIRDataSnapshot { return self._snapshot }
+    private var _snapshot: FIRDataSnapshot
+    var snapshot: FIRDataSnapshot { get { return self._snapshot } set { self._snapshot = newValue } }
     
     var key: String { return self._snapshot.key }
     
@@ -36,16 +36,6 @@ class FIRModel: CustomStringConvertible
         }
         
         return items
-    }
-    
-    func getExternal<T: FIRModel>(_ returningClass: T.Type, from collectionName: String, completion: @escaping (T) -> Void)
-    {
-        let collectionRef = FIRDatabase.database().reference().child(collectionName)
-        
-        collectionRef.child(self.key).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
-            
-            completion(T(snapshot: snapshot))
-        }
     }
     
     func getLinkKeys(for path: String) -> [String]
