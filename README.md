@@ -39,14 +39,12 @@ For demonstration purposes, we'll use the database structure defined below, comp
   {
     "-KbJXK4aoXc6NZ6VwD7W" : 
     {
-      "bio" : "Test artist bio",
       "country" : "US",
       "firstName" : "Mary",
       "lastName" : "Smith"
     },
     "-KbJbPknFNECn07m1yzy" : 
     {
-      "bio" : "Another artist bio",
       "country" : "US",
       "firstName" : "Kerry",
       "lastName" : "Winston"
@@ -77,14 +75,11 @@ class ArtistModel: FIRModel
 {	
 	static var FIELD_FIRSTNAME = "firstName"
 	static var FIELD_LASTNAME = "lastName"
-	static var FIELD_BIO = "bio"
 	static var FIELD_COUNTRY = "country"
 
 	var firstName: String? { return self.get(ArtistModel.FIELD_FIRSTNAME) }
     var lastName: String? { return self.get(ArtistModel.FIELD_LASTNAME) }
-	var bio: String? { return self.get(ArtistModel.FIELD_BIO) }
     var country: String? { return self.get(ArtistModel.FIELD_COUNTRY) }
-    var murals: [MuralModel] { return self.get(MuralModel.COLLECTION_NAME) }
 }
 ```
 Image:
@@ -104,7 +99,6 @@ let mural = MuralModel(snapshot: muralSnapshot)
 Properties can be as nested as necessary. Notice that `images` and `artists` in `MuralModel` are of complex object types. These are too subclasses of `FIRModel`. Look back at the database structure. As recommended in [Firebase's database structure guidelines](https://firebase.google.com/docs/database/web/structure-data]), in our database, the `artists` node consists only of keys. Because of this, the `artists` node, for example, will consist of a number of `ArtistModel`, but only the `key` property will be populated. This is where `FIRQueryable` comes in. 
 
 ## `FIRQueryable` Usage
-
 `FIRQueryable` is a protocol that can be adopted by any `FIRModel` that belongs to a top level collection in the Firebase database. By adopting this protocol, you'll simply need to define which collection your model belongs to. See example below of `ArtistModel`.
 
 ```swift
@@ -125,11 +119,77 @@ firstArtist.getExternal {
 }
 ```
 
-`FIRQueryable` additionally contains several static query-convenience functions.
+`FIRQueryable` additionally contains several static query-convenience functions. `FIRQueryable.Where()` is demonstrated below.
 
 ```swift
 MuralModel.Where(child: MuralModel.FIELD_NAME, equals: "Some value", limit: 1000) { (murals: [MuralModel]) in
             
     // Do something
+}
+```
+
+## `FIRPropertyWritable` Usage
+By nature, `FIRModel` is a read-only model. `FIRPropertyWritable` can be adopted to allow modifying properties in a `FIRModel`. A more sophisticated `MuralModel` is demonstrated below.
+
+```swift
+class MuralModel: FIRModel, FIRPropertyWritable
+{	
+	static var FIELD_NAME = "name"
+	static var FIELD_DESCRIPTION = "description"
+    static var FIELD_IMAGES = "images"
+    static var FIELD_ARTISTS = "artists"
+	
+	var name: String? {
+		get { return self.get(MuralModel.FIELD_NAME) }
+		set { self.set(value: newValue, for: MuralModel.FIELD_NAME) }
+	}
+	var desc: String? {
+		get { return self.get(MuralModel.FIELD_DESCRIPTION) }
+		set { self.set(value: newValue, for: MuralModel.FIELD_DESCRIPTION) }
+	}
+	
+	var images: [ImageModel] { return self.get(MuralModel.FIELD_IMAGES) }
+	var artists: [ArtistModel] { return self.get(MuralModel.FIELD_ARTISTS) }
+}
+```
+
+## `FIRInsertable` Usage
+`FIRInsertable` can be adopted by a `FIRModel` that belongs to a database collection that can be written to.
+```swift
+class ArtistModel: FIRModel, FIRInsertable
+{
+    static var COLLECTION_NAME = "artists"
+	
+	static var FIELD_FIRSTNAME = "firstName"
+	static var FIELD_LASTNAME = "lastName"
+	static var FIELD_COUNTRY = "country"
+
+	var firstName: String? { return self.get(ArtistModel.FIELD_FIRSTNAME) }
+	var lastName: String? { return self.get(ArtistModel.FIELD_LASTNAME) }
+	var country: String? { return self.get(ArtistModel.FIELD_COUNTRY) }
+
+    class func Create(firstName: String, lastName: String, bio: String, country: String, completion: @escaping (ArtistModel) -> Void)
+    {
+        let data = [
+            FIELD_FIRSTNAME: firstName,
+            FIELD_LASTNAME: lastName,
+            FIELD_COUNTRY: country
+        ]
+        
+        self.Insert(data: data, completion: completion)
+    }
+}
+```
+`FIRInsertable.Insert()` can also be used statically outside of a class.
+```swift
+let data = [
+    FIELD_FIRSTNAME: firstName,
+    FIELD_LASTNAME: lastName,
+    FIELD_COUNTRY: country
+]
+
+ArtistModel.Insert(data: data) { (createdArtist: ArtistModel) in
+    
+    // Handle completion
 }
 ```
