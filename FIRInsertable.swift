@@ -8,11 +8,11 @@ protocol FIRInsertable
 
 extension FIRInsertable where Self: FIRModel
 {
-    static func Insert(data: [String: Any], completion: @escaping (Self) -> Void)
+    static func Insert(data: [String: Any], completion: ((Self) -> Void)? = nil)
     {
         let ref = FIRDatabase.database().reference().child(COLLECTION_NAME).childByAutoId()
         ref.updateChildValues(data)
         
-        ref.observe(.value) { (snapshot: FIRDataSnapshot) in completion(Self.init(snapshot: snapshot)) }
+        ref.observe(.value) { (snapshot: FIRDataSnapshot) in completion?(Self.init(snapshot: snapshot)) }
     }
 }
