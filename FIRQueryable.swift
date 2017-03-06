@@ -10,9 +10,7 @@ extension FIRQueryable where Self: FIRModel
 {
     func getExternal(completion: @escaping () -> Void)
     {
-        let collectionRef = FIRDatabase.database().reference().child(Self.COLLECTION_NAME)
-        
-        collectionRef.child(self.key).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
+        Self.GetCollectionRef().child(self.key).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
             
             self.snapshot = snapshot
             completion()
@@ -43,19 +41,28 @@ extension FIRQueryable where Self: FIRModel
         }
     }
     
-    static func TopWhere(child path: String, equals value: Any?, completion: @escaping (Self) -> Void)
+    static func Where(child path: String, equals value: Any?, limit: UInt = 1000, completion: @escaping ([Self]) -> Void)
     {
         self.GetCollectionRef()
             .queryOrdered(byChild: path)
             .queryEqual(toValue: value)
-            .queryLimited(toFirst: 1)
-            .observeSingleEvent(of: .childAdded) { (snapshot: FIRDataSnapshot) in
+            .queryLimited(toFirst: limit)
+            .observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
+                
+                completion(self.GetModels(fromContainerSnapshot: snapshot))
+        }
+    }
+
+    
+    static func TopWhere(child path: String, equals value: Any?, completion: @escaping (Self?) -> Void)
+    {
+        self.Where(child: path, equals: value, limit: 1) { (items: [Self]) in
             
-                completion(Self(snapshot: snapshot))
+            completion(items.count == 0 ? nil : items[0])
         }
     }
     
-    private static func GetModels(fromContainerSnapshot snapshot: FIRDataSnapshot) -> [Self]
+    static func GetModels(fromContainerSnapshot snapshot: FIRDataSnapshot) -> [Self]
     {
         var models: [Self] = []
         
@@ -67,7 +74,7 @@ extension FIRQueryable where Self: FIRModel
         return models
     }
     
-    private static func GetCollectionRef() -> FIRDatabaseReference
+    static func GetCollectionRef() -> FIRDatabaseReference
     {
         return FIRDatabase.database().reference().child(COLLECTION_NAME)
     }
