@@ -133,3 +133,4 @@ MuralModel.Where(child: MuralModel.FIELD_NAME, equals: "Some value", limit: 1000
     // Do something
 }
 ```
+
