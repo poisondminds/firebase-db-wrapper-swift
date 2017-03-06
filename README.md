@@ -1,6 +1,8 @@
 # firebase-db-wrapper-swift
 An easy-to-use object wrapper for Firebase's Realtime Database
 
+**Dependencies:** FirebaseDatabase, FirebaseStorage
+
 For demonstration purposes, we'll use the database structure defined below, comprised of murals & artists:
 
 ```json
@@ -193,3 +195,26 @@ ArtistModel.Insert(data: data) { (createdArtist: ArtistModel) in
     // Handle completion
 }
 ```
+
+## `FIRStorageDownloadable` Usage
+Any `FIRModel` that has a `location: String` pointing to a location in Firebase Storage can instead adopt `FIRStorageDownloadable` to provide a seamless integration. In our case:
+```swift
+class ImageModel: FIRModel, FIRStorageDownloadable { }
+```
+Then from here,
+```swift
+let image: ImageModel = mural.images[0]
+image.getData(withMaxSize: 1 * 1024 * 1024, completion: { (d: Data?, e: Error?) in
+    
+    if let error = e
+    {
+        print("Woops: \(error)")
+    }
+    else if let data = d
+    {
+        self.imageView.image = UIImage(data: data)
+    }
+})
+```
+
+Enjoy!
