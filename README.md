@@ -1,8 +1,7 @@
 # firebase-db-wrapper-swift
 An easy-to-use object wrapper for Firebase's Realtime Database
 
-## Usage
-Subclass `FIRModel` to make your models serialize & deserialize from objects returned directly from your Firebase Realtime Database. For demonstration purposes, we'll use the database structure defined below, comprised of murals & artists:
+For demonstration purposes, we'll use the database structure defined below, comprised of murals & artists:
 
 ```json
 {
@@ -33,11 +32,7 @@ Subclass `FIRModel` to make your models serialize & deserialize from objects ret
         "name" : "Some building",
         "state" : "CA"
       },
-      "name" : "A really great mural",
-      "tags" : 
-      {
-        "contemporary" : true
-      }
+      "name" : "A really great mural"
     }
   },
   "artists" : 
@@ -58,8 +53,9 @@ Subclass `FIRModel` to make your models serialize & deserialize from objects ret
     }
 }
 ```
+## `FIRModel` Usage
+Subclass `FIRModel` to make your models serialize & deserialize from objects returned directly from your Firebase Realtime Database. The structure of a simple read-only `FIRModel` representing a mural may look like this:
 
-The structure of a simple read-only `FIRModel` representing a mural may look like this:
 ```swift
 class MuralModel: FIRModel
 {	
@@ -105,4 +101,35 @@ class ImageModel: FIRModel
 let mural = MuralModel(snapshot: muralSnapshot)
 ```
 
-Properties can be as nested as necessary. Notice that `images` and `artists` in `MuralModel` are of complex object types. These are too subclasses of `FIRModel`. Look back at the database structure. As recommended in [Firebase's database structure guidelines](https://firebase.google.com/docs/database/web/structure-data]), in our database, the `images` and `artists` nodes consist only of keys. Because of this, the `images` node, for example, will consist of a number of `ImageModel`s 
+Properties can be as nested as necessary. Notice that `images` and `artists` in `MuralModel` are of complex object types. These are too subclasses of `FIRModel`. Look back at the database structure. As recommended in [Firebase's database structure guidelines](https://firebase.google.com/docs/database/web/structure-data]), in our database, the `artists` node consists only of keys. Because of this, the `artists` node, for example, will consist of a number of `ArtistModel`, but only the `key` property will be populated. This is where `FIRQueryable` comes in. 
+
+## `FIRQueryable` Usage
+
+`FIRQueryable` is a protocol that can be adopted by any `FIRModel` that belongs to a top level collection in the Firebase database. By adopting this protocol, you'll simply need to define which collection your model belongs to. See example below of `ArtistModel`.
+
+```swift
+class ArtistModel: FIRModel, FIRQueryable
+{	
+	static var COLLECTION_NAME = "artists"
+	
+	...
+}
+```
+
+When `FIRQueryable` is adopted, you may use `getExternal(completion: () -> ())` to retrieve a partially populated model. See example below.
+
+```swift
+let firstArtist = self.mural.artists[0]
+firstArtist.getExternal {
+    self.artistLabel.text = firstArtist.firstName
+}
+```
+
+`FIRQueryable` additionally contains several static query-convenience functions.
+
+```swift
+MuralModel.Where(child: MuralModel.FIELD_NAME, equals: "Some value", limit: 1000) { (murals: [MuralModel]) in
+            
+    // Do something
+}
+```
