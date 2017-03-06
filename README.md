@@ -170,7 +170,7 @@ class ArtistModel: FIRModel, FIRInsertable
 	var lastName: String? { return self.get(ArtistModel.FIELD_LASTNAME) }
 	var country: String? { return self.get(ArtistModel.FIELD_COUNTRY) }
 
-    class func Create(firstName: String, lastName: String, bio: String, country: String, completion: @escaping (ArtistModel) -> Void)
+    class func Create(firstName: String, lastName: String, country: String, completion: @escaping (ArtistModel) -> Void)
     {
         let data = [
             FIELD_FIRSTNAME: firstName,
