@@ -189,6 +189,9 @@ ArtistModel.Insert(data: data) { (createdArtist: ArtistModel) in
 }
 ```
 
+## `FIRDeletable` Usage
+`FIRDeletable` can be adopted by a `FIRModel` that belongs to a database collection that can be written to. A class that adopts `FIRDeletable` has the ability to call the function `delete()`
+
 ## `FIRStorageDownloadable` Usage
 Any `FIRModel` that has a `location: String` pointing to a location in Firebase Storage can instead adopt `FIRStorageDownloadable` to provide a seamless integration. In our case:
 ```swift
