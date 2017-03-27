@@ -33,14 +33,14 @@ extension FIRQueryable where Self: FIRModel
         }
     }
     
-    static func Top(completion: @escaping (Self) -> Void)
-    {
-        self.GetCollectionRef().queryLimited(toFirst: 1).observeSingleEvent(of: .childAdded) { (snapshot: FIRDataSnapshot) in
-            
-            completion(Self(snapshot: snapshot))
-        }
-    }
-    
+	static func Top(_ limit: UInt, completion: @escaping ([Self]) -> Void)
+	{
+		self.GetCollectionRef().queryLimited(toFirst: limit).observeSingleEvent(of: .value) { (snapshot: FIRDataSnapshot) in
+			
+			completion(self.GetModels(fromContainerSnapshot: snapshot))
+		}
+	}
+	
     static func Where(child path: String, equals value: Any?, limit: UInt = 1000, completion: @escaping ([Self]) -> Void)
     {
         self.GetCollectionRef()
