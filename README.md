@@ -131,8 +131,8 @@ class MuralModel: FIRModel, FIRPropertyWritable
 {	
 	static var FIELD_NAME = "name"
 	static var FIELD_DESCRIPTION = "description"
-    static var FIELD_IMAGES = "images"
-    static var FIELD_ARTISTS = "artists"
+    	static var FIELD_IMAGES = "images"
+    	static var FIELD_ARTISTS = "artists"
 	
 	var name: String? {
 		get { return self.get(MuralModel.FIELD_NAME) }
