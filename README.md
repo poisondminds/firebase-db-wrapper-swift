@@ -73,8 +73,8 @@ class ArtistModel: FIRModel
 	static var FIELD_COUNTRY = "country"
 
 	var firstName: String? { return self.get(ArtistModel.FIELD_FIRSTNAME) }
-    var lastName: String? { return self.get(ArtistModel.FIELD_LASTNAME) }
-    var country: String? { return self.get(ArtistModel.FIELD_COUNTRY) }
+    	var lastName: String? { return self.get(ArtistModel.FIELD_LASTNAME) }
+    	var country: String? { return self.get(ArtistModel.FIELD_COUNTRY) }
 }
 ```
 Image:
